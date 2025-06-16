@@ -12,11 +12,16 @@ class OptionSerializer(serializers.ModelSerializer):
 
 
 class PollSerializer(serializers.ModelSerializer):
-    poll_options = OptionSerializer(many=True)
+    poll_options = OptionSerializer(many=True, required=True)
 
     class Meta:
         model = Poll
         fields = ('id', 'title', 'poll_options')
+
+    def validate_poll_options(self, value):
+        if not value:
+            raise serializers.ValidationError({'poll_options': 'Нельзя создать опрос без вариантов ответа'})
+        return value
 
     @transaction.atomic
     def create(self, validated_data):
@@ -47,7 +52,8 @@ class PollResultSerializer(serializers.ModelSerializer):
 
     def _get_annotated_options(self, obj):
         if not hasattr(obj, '_annotated_options'):
-            obj._annotated_options = obj.poll_options.annotate(votes_count=Count('option_votes')).order_by('-votes_count')
+            obj._annotated_options = obj.poll_options.annotate(votes_count=Count('option_votes')).order_by(
+                '-votes_count')
 
         return obj._annotated_options
 

@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 from main.models import Poll
 from main.serializers import PollSerializer, VoteSerializer, PollResultSerializer
-from main.utils import get_client_ip, generate_voter_id, user_already_voted, option_does_not_belong_to_poll
+from main.utils import get_client_ip, generate_voter_id, user_already_voted, option_does_not_exist
 
 
 class PollCreateAPIView(CreateAPIView):
@@ -35,8 +35,8 @@ class VoteAPIView(APIView):
             return Response({'detail': 'Вы уже голосовали'}, status=status.HTTP_400_BAD_REQUEST)
 
         option_id = request.data.get('option')
-        if option_does_not_belong_to_poll(option_id, poll_id):
-            return Response({'detail': 'Получен отсутствующий вариант ответа'},
+        if option_does_not_exist(option_id, poll_id):
+            return Response({'detail': 'Получен отсутствующий вариант ответа, или опрос с таким ID не существует'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         vote_data = {

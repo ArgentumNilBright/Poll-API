@@ -26,7 +26,7 @@ def user_already_voted(voter_id, ip, user_agent, poll_id):
     return already_voted
 
 
-def option_does_not_belong_to_poll(option_id, poll_id):
+def option_does_not_exist(option_id, poll_id):
     queryset = Option.objects.filter(poll_id=poll_id)
     option_does_not_exist = not queryset.filter(id=option_id).exists()
 
